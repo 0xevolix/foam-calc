@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Raumgewicht Rechner</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  :root { --accent: #ff00d8; }
+  body { background: #0b0b0b; color: var(--accent); }
+
+  .tab-btn {
+    background-color: #1a1a1a;
+    color: #fff;
+    border: 2px solid transparent;
+    border-radius: 0.5rem;
+    padding: 0.5rem 1rem;
+    font-weight: 600;
+    transition: all 0.2s ease;
+  }
+  .tab-btn:hover { opacity: 0.8; }
+  .tab-btn.active {
+    background-color: var(--accent);
+    color: white;
+    border-color: var(--accent);
+    box-shadow: 0 0 3px var(--accent);
+  }
+
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+
+  input[type="radio"] { accent-color: var(--accent); }
+  .text-accent { color: var(--accent); }
+  .bg-accent { background-color: var(--accent); }
+  .border-accent { border-color: var(--accent); }
+</style>
+</head>
+<body class="min-h-screen flex flex-col items-center p-6 text-accent">
+
+<header class="w-full flex justify-center items-center mb-6 max-w-6xl ">
+  <h1 id="title" class="text-3xl font-bold drop-shadow-lg">Raumgewicht Rechner</h1>
+  <div class="relative ml-6">
+    <select id="langSwitch" class="bg-neutral-800 text-accent border border-neutral-700 rounded-lg px-3 py-1 text-sm focus:outline-none">
+      <option value="de">🇩🇪 Deutsch</option>
+      <option value="en">🇬🇧 English</option>
+    </select>
+  </div>
+</header>
+
+<div class="bg-neutral-900 border border-neutral-700 rounded-2xl p-6 max-w-lg w-full shadow-lg">
+
+  <label for="shapeSelect" class="font-semibold block mt-2">Form</label>
+  <select id="shapeSelect" class="w-full p-2 rounded bg-neutral-800 text-accent border border-neutral-700 focus:outline-none">
+    <option value="cylinder">Zylinder / Cylinder</option>
+    <option value="rect">Rechteck / Rectangular</option>
+  </select>
+
+  <!-- Zylinder Inputs -->
+  <div id="cylinderInputs" class="mt-3">
+    <label for="diameter" id="labelDiameter" class="font-semibold block mt-2">Durchmesser (mm)</label>
+    <input type="number" id="diameter" placeholder="z. B. 90" class="w-full p-2 rounded bg-neutral-800 text-accent border border-neutral-700 focus:outline-none">
+
+    <label for="thickness" id="labelThickness" class="font-semibold block mt-3">Dicke (mm)</label>
+    <input type="number" id="thickness" placeholder="z. B. 3" class="w-full p-2 rounded bg-neutral-800 text-accent border border-neutral-700 focus:outline-none">
+  </div>
+
+  <!-- Rechteck Inputs -->
+  <div id="rectInputs" class="hidden mt-3">
+    <label for="length" class="font-semibold block mt-2">Länge (mm)</label>
+    <input type="number" id="length" placeholder="z. B. 100" class="w-full p-2 rounded bg-neutral-800 text-accent border border-neutral-700 focus:outline-none">
+    <label for="width" class="font-semibold block mt-2">Breite (mm)</label>
+    <input type="number" id="width" placeholder="z. B. 50" class="w-full p-2 rounded bg-neutral-800 text-accent border border-neutral-700 focus:outline-none">
+    <label for="height" class="font-semibold block mt-2">Höhe (mm)</label>
+    <input type="number" id="height" placeholder="z. B. 30" class="w-full p-2 rounded bg-neutral-800 text-accent border border-neutral-700 focus:outline-none">
+  </div>
+
+  <label for="mass" id="labelMass" class="font-semibold block mt-3">Gewicht pro Stück (g)</label>
+  <input type="number" id="mass" placeholder="z. B. 0.37" class="w-full p-2 rounded bg-neutral-800 text-accent border border-neutral-700 focus:outline-none">
+
+  <div class="bg-neutral-800 border border-neutral-700 rounded-xl mt-5 p-4">
+    <h3 id="calcTitle" class="font-bold text-accent mb-2">Berechnete Werte</h3>
+    <table class="w-full text-sm">
+      <tr><th id="vol1Label" class="text-left text-accent">Volumen</th><td id="volumeCm">–</td><td>cm³</td></tr>
+      <tr><th id="vol2Label" class="text-left text-accent">Volumen</th><td id="volumeM">–</td><td>m³</td></tr>
+      <tr><th id="dens1Label" class="text-left text-accent">Raumgewicht</th><td id="densityG">–</td><td>kg/m³</td></tr>
+      <tr><th id="dens2Label" class="text-left text-accent">Raumgewicht</th><td id="densityKg">–</td><td>g/cm³</td></tr>
+    </table>
+    <p id="comparison" class="italic text-accent mt-2"></p>
+  </div>
+
+  <hr class="my-5 border-neutral-700">
+
+  <label for="pores" id="labelPores" class="font-semibold block mt-2">Porendichte</label>
+  
+  <div class="flex gap-4 text-sm mt-3" id="unitLabels">
+    <label><input type="radio" name="unit" value="mm" checked> pro mm</label>
+    <label><input type="radio" name="unit" value="cm"> pro cm</label>
+  </div>
+  <input type="number" id="pores" placeholder="" class="w-full p-2 rounded bg-neutral-800 text-accent border border-neutral-700 focus:outline-none">
+
+
+
+  <div class="bg-neutral-800 border border-neutral-700 rounded-xl mt-4 p-4">
+    <h3 id="ppiTitle" class="font-bold text-accent mb-2">PPI Berechnung</h3>
+    <table class="w-full text-sm">
+      <tr><th id="ppiLabel" class="text-left text-accent">Pores per Inch</th><td id="ppiValue">–</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="mt-10 max-w-5xl w-full">
+  <div class="flex justify-center gap-4 mb-4">
+    <button id="tabFoam" class="tab-btn">Schaumstofftypen</button>
+    <button id="tabFreq" class="tab-btn">Frequenzbereiche</button>
+  </div>
+  <div id="foamTableContainer" class="overflow-x-auto text-accent"></div>
+  <div id="freqTableContainer" class="overflow-x-auto hidden text-accent"></div>
+</div>
+
+<footer id="footerText" class="mt-10 text-sm text-accent">Made with 💜 | evolix</footer>
+
+<script>
+// === Sprachen, CSVs, Tabellen wie zuvor ===
+const translations = {
+  de:{title:"Raumgewicht Rechner",labelDiameter:"Durchmesser (mm)",labelThickness:"Dicke (mm)",labelMass:"Gewicht pro Stück (g)",calcTitle:"Berechnete Werte",vol1Label:"Volumen",vol2Label:"Volumen",dens1Label:"Raumgewicht",dens2Label:"Raumgewicht",labelPores:"Porendichte",unitLabels:["pro mm","pro cm","pro inch"],ppiTitle:"PPI Berechnung",ppiLabel:"Pores per Inch",tabFoam:"Schaumstofftypen",tabFreq:"Frequenzbereiche",footerText:"Made with 💜 | evolix",comparisonTexts:["Sehr leichter Schaumstoff (unter 15 kg/m³ – extrem weich).","Typischer Akustikschaum (15–30 kg/m³).","Dichterer Schaumstoff (> 30 kg/m³ – Polster oder Technikschaum)."]},
+  en:{title:"Foam Density Calculator",labelDiameter:"Diameter (mm)",labelThickness:"Thickness (mm)",labelMass:"Weight per Piece (g)",calcTitle:"Calculated Values",vol1Label:"Volume",vol2Label:"Volume",dens1Label:"Density",dens2Label:"Density",labelPores:"Pore Density",unitLabels:["per mm","per cm","per inch"],ppiTitle:"PPI Calculation",ppiLabel:"Pores per Inch",tabFoam:"Foam Types",tabFreq:"Frequency Ranges",footerText:"Made with 💜 | evolix",comparisonTexts:["Very light foam (below 15 kg/m³ – extremely soft).","Typical acoustic foam (15–30 kg/m³).","Denser foam (>30 kg/m³ – cushioning or technical foam)."]}
+};
+
+let currentLang = "en";
+document.addEventListener("DOMContentLoaded",()=>{
+  document.getElementById("langSwitch").value="en";
+  applyLanguage();
+  switchTab("foam");
+});
+
+// === Inputs & Berechnung ===
+const shapeSelect = document.getElementById('shapeSelect');
+const dInput = document.getElementById('diameter');
+const tInput = document.getElementById('thickness');
+const lInput = document.getElementById('length');
+const wInput = document.getElementById('width');
+const hInput = document.getElementById('height');
+const mInput = document.getElementById('mass');
+const pInput = document.getElementById('pores');
+const units = document.querySelectorAll('input[name="unit"]');
+const vCm = document.getElementById('volumeCm');
+const vM = document.getElementById('volumeM');
+const dKg = document.getElementById('densityKg');
+const dG = document.getElementById('densityG');
+const comparison = document.getElementById('comparison');
+const ppiValue = document.getElementById('ppiValue');
+
+function toggleShapeInputs(){
+  const isCylinder = shapeSelect.value==='cylinder';
+  document.getElementById('cylinderInputs').classList.toggle('hidden',!isCylinder);
+  document.getElementById('rectInputs').classList.toggle('hidden',isCylinder);
+  update();
+}
+shapeSelect.addEventListener('change',toggleShapeInputs);
+
+function update(){
+  const formatter = new Intl.NumberFormat(currentLang==="de"?"de-DE":"en-US",{maximumFractionDigits:3});
+  const isCylinder = shapeSelect.value==='cylinder';
+  const M = parseFloat(mInput.value); if(!M) return;
+  let Vcm3=0;
+  if(isCylinder){
+    const D=parseFloat(dInput.value);
+    const H=parseFloat(tInput.value);
+    if(!D||!H) return;
+    Vcm3 = Math.PI*Math.pow(D/20,2)*(H/10);
+  } else {
+    const L=parseFloat(lInput.value), W=parseFloat(wInput.value), H=parseFloat(hInput.value);
+    if(!L||!W||!H) return;
+    Vcm3 = L*W*H/1000;
+  }
+  const Vm3=Vcm3/1e6;
+  const density = M/Vm3;
+  const densityG = density/1000;
+
+  vCm.textContent = formatter.format(Vcm3);
+  vM.textContent = Vm3.toExponential(3).replace('.',currentLang==="de"?',':'.');
+  dKg.textContent = formatter.format(density);
+  dG.textContent = formatter.format(densityG);
+
+  const t = translations[currentLang].comparisonTexts;
+  if(density<15) comparison.textContent = t[0];
+  else if(density<30) comparison.textContent = t[1];
+  else comparison.textContent = t[2];
+}
+
+[dInput,tInput,lInput,wInput,hInput,mInput].forEach(el=>el.addEventListener('input',update));
+
+function updatePPI(){
+  const pores=parseFloat(pInput.value); if(!pores) return;
+  const unit=document.querySelector('input[name="unit"]:checked').value;
+  const inch=25.4; let ppi=0;
+  if(unit==='mm') ppi=pores*inch;
+  else if(unit==='cm') ppi=pores*(inch/10);
+  else ppi=pores;
+  ppiValue.textContent=new Intl.NumberFormat(currentLang==="de"?"de-DE":"en-US",{maximumFractionDigits:1}).format(ppi);
+}
+pInput.addEventListener('input',updatePPI);
+units.forEach(u => u.addEventListener('change', () => {
+  // Immer den aktuellen Input-Wert neu berechnen
+  if (pInput.value !== '') updatePPI();
+}));
+// === Tabs ===
+const tabFoam=document.getElementById('tabFoam');
+const tabFreq=document.getElementById('tabFreq');
+const foamTable=document.getElementById('foamTableContainer');
+const freqTable=document.getElementById('freqTableContainer');
+function switchTab(tab){
+  if(tab==='foam'){foamTable.classList.remove('hidden');freqTable.classList.add('hidden');tabFoam.classList.add('active');tabFreq.classList.remove('active');}
+  else{freqTable.classList.remove('hidden');foamTable.classList.add('hidden');tabFreq.classList.add('active');tabFoam.classList.remove('active');}
+}
+tabFoam.addEventListener('click',()=>switchTab('foam'));
+tabFreq.addEventListener('click',()=>switchTab('freq'));
+
+// === Sprache ===
+document.getElementById('langSwitch').addEventListener('change',e=>{
+  currentLang=e.target.value; applyLanguage();
+});
+
+function applyLanguage(){
+  const t=translations[currentLang];
+  document.getElementById('title').textContent=t.title;
+  document.getElementById('labelDiameter').textContent=t.labelDiameter;
+  document.getElementById('labelThickness').textContent=t.labelThickness;
+  document.getElementById('labelMass').textContent=t.labelMass;
+  document.getElementById('calcTitle').textContent=t.calcTitle;
+  document.getElementById('vol1Label').textContent=t.vol1Label;
+  document.getElementById('vol2Label').textContent=t.vol2Label;
+  document.getElementById('dens1Label').textContent=t.dens1Label;
+  document.getElementById('dens2Label').textContent=t.dens2Label;
+  document.getElementById('labelPores').textContent=t.labelPores;
+  document.getElementById('ppiTitle').textContent=t.ppiTitle;
+  document.getElementById('ppiLabel').textContent=t.ppiLabel;
+  document.getElementById('tabFoam').textContent=t.tabFoam;
+  document.getElementById('tabFreq').textContent=t.tabFreq;
+  document.getElementById('footerText').textContent=t.footerText;
+
+  const unitLabels=document.querySelectorAll('#unitLabels label');
+  unitLabels.forEach((label,i)=>{
+    const input=label.querySelector('input');
+    label.innerHTML=`<input type="radio" name="unit" value="${input.value}" ${input.checked?'checked':''}> ${t.unitLabels[i]}`;
+  });
+
+// === Foam & Frequency CSVs ===
+const foamCSV = {
+  de: `Schaumstofftyp,Typische Dichte (kg/m³),Akustische Eigenschaften / Empfohlene Anwendung,Typischer NRC (α),Hinweise
+Leichter Verpackungsschaum (sehr niedrigdichtes PU),15–25,"Sehr leicht und offenporig → schwache Tieftonabsorption; leicht absorbierend bei Mittel-/Hochton. Hauptsächlich Verpackung, nicht Akustik.",0.20–0.35,"Kaum Akustikdämpfung; reflektiert unter 1 kHz."
+Standard-PU-Schaum (Möbel / Matratzenkern),25–35,"Mittlere Absorption im Mittel-/Hochton; begrenzte Bassabsorption. Für Grundschalldämpfung geeignet.",0.40–0.60,"Effektiv über 500 Hz; schwach unter 250 Hz."
+Hochwertiger Kaltschaum (HR-Schaum),35–50,"Bessere Elastizität und höhere Dichte → verbesserte Mitteltonabsorption. Für Akustikpaneele, Gesangskabinen etc.",0.55–0.70,"Gut im Mittelton; brauchbar breitbandig ab >5 cm Stärke."
+Hochdichte technische Schäume,50–70,"Mehr Masse → mehr Dämpfung im Tiefton; ggf. zu dicht für Höhen. Industrielle Akustikpaneele, Isolationslagen.",0.60–0.75,"Wirksame Breitbanddämpfung, besonders mehrlagig."
+Spezielle Akustik- / Isolationsschäume,70–250,"Hohe Masse + offene Struktur → breitbandige Absorption inkl. Bass. Bis zu 40–43 dB Schalldämmung.",0.70–0.90,"Exzellente Breitbandabsorption bei >8 cm Dicke; dient als Schallsperre."
+Melaminharzschaum (Basotect),8–12,"Extrem leicht, hoch offenporig → hervorragende Mittel-/Hochtonabsorption (α ≈ 0.8–0.95).",0.85–0.95,"Top-Absorber über 500 Hz; ideal für Studios/Büros."
+EPP / PE-Technikschäume (teilweise geschlossen),30–80,"Eher reflektierend als absorbierend; Stoßdämpfung, nicht Raumakustik.",0.10–0.30,"Besser für Vibration als für Schall."
+Sehr dichte PU- oder Epoxidschäume (strukturell),100–300,"Zu dicht/geschlossen für Absorption; Reflexion oder Vibrationsisolierung.",0.05–0.15,"Reflektierend; nicht empfohlen für Akustik."`,
+  en: `Foam Type,Typical Density (kg/m³),Acoustic Properties / Recommended Use,Typical NRC (α),Notes
+Light / Packaging Foam (very low-density PU),15–25,"Very light and open-cell → weak low-frequency absorption; slightly absorbs mid- and high-frequencies.",0.20–0.35,"Minimal acoustic absorption; mostly reflective below 1 kHz."
+Standard PU Foam (furniture / mattress core),25–35,"Moderate absorption in mid- and high-frequency range; limited bass absorption.",0.40–0.60,"Effective above 500 Hz; poor below 250 Hz."
+Higher-Quality Cold Foam (HR foam),35–50,"Better elasticity and density → improved mid- and low-mid absorption. Used for general acoustic panels.",0.55–0.70,"Good midrange absorption; fair broadband use when thick (>5 cm)."
+High-Density Technical Foams,50–70,"Increased mass absorbs more low-mids; too dense for highs if less open.",0.60–0.75,"More effective broadband damping, especially multilayered."
+Special Acoustic Foams / Sound Insulation Materials,70–250,"Designed for insulation: high mass + open structure = broadband absorption including bass.",0.70–0.90,"Excellent broadband absorption when >8 cm thick; doubles as barrier."
+Melamine Acoustic Foam (Basotect type),8–12,"Extremely light and open-cell → excellent mid/high absorption (α≈0.8–0.95).",0.85–0.95,"Top absorber above 500 Hz; ideal for studios/offices."
+EPP / PE Technical Foams (partially closed-cell),30–80,"More reflective; good for impact damping but poor acoustic absorption.",0.10–0.30,"Mostly reflective; better for vibration than sound."
+Very Dense Polyurethane or Epoxy Foams (structural),100–300,"Too dense/closed for absorption; used for vibration isolation.",0.05–0.15,"Reflective; not recommended for absorption."`
+};
+
+const freqCSV = {
+  de: `Frequenzbereich,Beste Dichte (kg/m³),Schaumeigenschaften,Beispiele / Anwendung,Typischer NRC (α)
+Hohe Frequenzen (2–10 kHz),8–30,"Offenporige, leichte Schäume (Melamin, PU)","Studio, Gesangskabinen, Kopfhörerpolster",0.80–0.95
+Mittlere Frequenzen (500–2000 Hz),25–50,"Etwas dichtere offene Schäume","Raumakustik, Paneele, Lautsprecher",0.55–0.75
+Tiefe Frequenzen (<500 Hz),50–150,"Schwere offene oder mehrlagige Schäume","Bassfallen, industrielle Isolierung",0.60–0.85
+Schalldämmung / Isolation,100–250,"Hochdichte technische Schäume, laminiert","Maschinen, Wände, Fahrzeuge",0.70–0.90`,
+  en: `Frequency Range,Best Density (kg/m³),Foam Characteristics,Examples / Use,Typical NRC (α)
+High Frequencies (2–10 kHz),8–30,"Open-cell, low-density foams (Melamine, PU)","Studios, vocal booths, headphones",0.80–0.95
+Mid Frequencies (500–2000 Hz),25–50,"Slightly denser open-cell foams","Room treatment, absorber panels, speakers",0.55–0.75
+Low Frequencies (<500 Hz),50–150,"Heavier open-cell or multilayer foams","Bass traps, industrial sound insulation",0.60–0.85
+Soundproofing / Isolation,100–250,"High-mass technical foams, laminated","Machines, walls, automotive barriers",0.70–0.90`
+};
+
+// === Funktion zum Umwandeln von CSV in HTML-Table ===
+function csvToTable(csv, containerId) {
+  const lines = csv.trim().split('\n');
+  const headers = lines[0].split(',');
+  const container = document.getElementById(containerId);
+  let html = `<table class="min-w-full text-sm p-6 max-w-lg rounded-2xl overflow-hidden">
+    <thead class="bg-neutral-900 text-accent"><tr>${headers.map(h => `<th class="p-2 text-left">${h}</th>`).join('')}</tr></thead>
+    <tbody class="bg-neutral-800">`;
+
+  for (let i = 1; i < lines.length; i++) {
+    const cols = lines[i].match(/(".*?"|[^",]+)(?=\s*,|\s*$)/g);
+    html += `<tr class="hover:bg-neutral-800 transition">`;
+    cols.forEach(c => html += `<td class="p-2 align-top">${c.replace(/(^"|"$)/g, '')}</td>`);
+    html += `</tr>`;
+  }
+  html += `</tbody></table>`;
+  container.innerHTML = html;
+}
+
+// === Tabellen initial laden ===
+csvToTable(foamCSV[currentLang], "foamTableContainer");
+csvToTable(freqCSV[currentLang], "freqTableContainer");
+
+// === Tabs aktivieren ===
+const tabFoam = document.getElementById('tabFoam');
+const tabFreq = document.getElementById('tabFreq');
+const foamTable = document.getElementById('foamTableContainer');
+const freqTable = document.getElementById('freqTableContainer');
+
+function switchTab(tab) {
+  if (tab === 'foam') {
+    foamTable.classList.remove('hidden');
+    freqTable.classList.add('hidden');
+    tabFoam.classList.add('active');
+    tabFreq.classList.remove('active');
+  } else {
+    freqTable.classList.remove('hidden');
+    foamTable.classList.add('hidden');
+    tabFreq.classList.add('active');
+    tabFoam.classList.remove('active');
+  }
+}
+
+tabFoam.addEventListener('click', () => switchTab('foam'));
+tabFreq.addEventListener('click', () => switchTab('freq'));
+
+
+
+
+  update(); updatePPI();
+}
+</script>
+
+</body>
+</html>
