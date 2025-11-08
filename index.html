@@ -55,7 +55,7 @@
     <option value="rect">Rechteck / Rectangular</option>
   </select>
 
-  <!-- Zylinder Inputs -->
+
   <div id="cylinderInputs" class="mt-3">
     <label for="diameter" id="labelDiameter" class="font-semibold block mt-2">Durchmesser (mm)</label>
     <input type="number" id="diameter" placeholder="z. B. 90" class="w-full p-2 rounded bg-neutral-800 text-accent border border-neutral-700 focus:outline-none">
@@ -64,13 +64,12 @@
     <input type="number" id="thickness" placeholder="z. B. 3" class="w-full p-2 rounded bg-neutral-800 text-accent border border-neutral-700 focus:outline-none">
   </div>
 
-  <!-- Rechteck Inputs -->
   <div id="rectInputs" class="hidden mt-3">
-    <label for="length" class="font-semibold block mt-2">Länge (mm)</label>
+    <label for="length" id="labelLength" class="font-semibold block mt-2">Länge (mm)</label>
     <input type="number" id="length" placeholder="z. B. 100" class="w-full p-2 rounded bg-neutral-800 text-accent border border-neutral-700 focus:outline-none">
-    <label for="width" class="font-semibold block mt-2">Breite (mm)</label>
+    <label for="width" id="labelWidth" class="font-semibold block mt-2">Breite (mm)</label>
     <input type="number" id="width" placeholder="z. B. 50" class="w-full p-2 rounded bg-neutral-800 text-accent border border-neutral-700 focus:outline-none">
-    <label for="height" class="font-semibold block mt-2">Höhe (mm)</label>
+    <label for="height" id="labelHeight" class="font-semibold block mt-2">Höhe (mm)</label>
     <input type="number" id="height" placeholder="z. B. 30" class="w-full p-2 rounded bg-neutral-800 text-accent border border-neutral-700 focus:outline-none">
   </div>
 
@@ -120,10 +119,10 @@
 <footer id="footerText" class="mt-10 text-sm text-accent">Made with 💜 | evolix</footer>
 
 <script>
-// === Sprachen, CSVs, Tabellen wie zuvor ===
+
 const translations = {
-  de:{title:"Raumgewicht Rechner",labelDiameter:"Durchmesser (mm)",labelThickness:"Dicke (mm)",labelMass:"Gewicht pro Stück (g)",calcTitle:"Berechnete Werte",vol1Label:"Volumen",vol2Label:"Volumen",dens1Label:"Raumgewicht",dens2Label:"Raumgewicht",labelPores:"Porendichte",unitLabels:["pro mm","pro cm","pro inch"],ppiTitle:"PPI Berechnung",ppiLabel:"Pores per Inch",tabFoam:"Schaumstofftypen",tabFreq:"Frequenzbereiche",footerText:"Made with 💜 | evolix",comparisonTexts:["Sehr leichter Schaumstoff (unter 15 kg/m³ – extrem weich).","Typischer Akustikschaum (15–30 kg/m³).","Dichterer Schaumstoff (> 30 kg/m³ – Polster oder Technikschaum)."]},
-  en:{title:"Foam Density Calculator",labelDiameter:"Diameter (mm)",labelThickness:"Thickness (mm)",labelMass:"Weight per Piece (g)",calcTitle:"Calculated Values",vol1Label:"Volume",vol2Label:"Volume",dens1Label:"Density",dens2Label:"Density",labelPores:"Pore Density",unitLabels:["per mm","per cm","per inch"],ppiTitle:"PPI Calculation",ppiLabel:"Pores per Inch",tabFoam:"Foam Types",tabFreq:"Frequency Ranges",footerText:"Made with 💜 | evolix",comparisonTexts:["Very light foam (below 15 kg/m³ – extremely soft).","Typical acoustic foam (15–30 kg/m³).","Denser foam (>30 kg/m³ – cushioning or technical foam)."]}
+  de:{title:"Raumgewicht Rechner",labelDiameter:"Durchmesser (mm)",labelThickness:"Dicke (mm)",labelLength:"Länge (mm)",labelWidth:"Breite (mm)",labelHeight:"Höhe (mm)",labelMass:"Gewicht pro Stück (g)",calcTitle:"Berechnete Werte",vol1Label:"Volumen",vol2Label:"Volumen",dens1Label:"Raumgewicht",dens2Label:"Raumgewicht",labelPores:"Porendichte",unitLabels:["pro mm","pro cm","pro inch"],ppiTitle:"PPI Berechnung",ppiLabel:"Pores per Inch",tabFoam:"Schaumstofftypen",tabFreq:"Frequenzbereiche",footerText:"Made with 💜 | evolix",comparisonTexts:["Sehr leichter Schaumstoff (unter 15 kg/m³ – extrem weich).","Typischer Akustikschaum (15–30 kg/m³).","Dichterer Schaumstoff (> 30 kg/m³ – Polster oder Technikschaum)."]},
+  en:{title:"Foam Density Calculator",labelDiameter:"Diameter (mm)",labelThickness:"Thickness (mm)",labelLength:"Length (mm)",labelWidth:"Width (mm)",labelHeight:"Height (mm)",labelMass:"Weight per Piece (g)",calcTitle:"Calculated Values",vol1Label:"Volume",vol2Label:"Volume",dens1Label:"Density",dens2Label:"Density",labelPores:"Pore Density",unitLabels:["per mm","per cm","per inch"],ppiTitle:"PPI Calculation",ppiLabel:"Pores per Inch",tabFoam:"Foam Types",tabFreq:"Frequency Ranges",footerText:"Made with 💜 | evolix",comparisonTexts:["Very light foam (below 15 kg/m³ – extremely soft).","Typical acoustic foam (15–30 kg/m³).","Denser foam (>30 kg/m³ – cushioning or technical foam)."]}
 };
 
 let currentLang = "en";
@@ -133,7 +132,7 @@ document.addEventListener("DOMContentLoaded",()=>{
   switchTab("foam");
 });
 
-// === Inputs & Berechnung ===
+
 const shapeSelect = document.getElementById('shapeSelect');
 const dInput = document.getElementById('diameter');
 const tInput = document.getElementById('thickness');
@@ -160,6 +159,7 @@ shapeSelect.addEventListener('change',toggleShapeInputs);
 
 function update(){
   const formatter = new Intl.NumberFormat(currentLang==="de"?"de-DE":"en-US",{maximumFractionDigits:3});
+  
   const isCylinder = shapeSelect.value==='cylinder';
   const M = parseFloat(mInput.value); if(!M) return;
   let Vcm3=0;
@@ -182,10 +182,12 @@ function update(){
   dKg.textContent = formatter.format(density);
   dG.textContent = formatter.format(densityG);
 
-//  const t = translations[currentLang].comparisonTexts;
-//  if(density<15) comparison.textContent = t[0];
-//  else if(density<30) comparison.textContent = t[1];
+  const t = translations[currentLang].comparisonTexts;
+
+//  if(density < 15.0) comparison.textContent = t[0];
+//  else if(density < 30.0) comparison.textContent = t[1];
 //  else comparison.textContent = t[2];
+
 }
 
 [dInput,tInput,lInput,wInput,hInput,mInput].forEach(el=>el.addEventListener('input',update));
@@ -198,13 +200,16 @@ function updatePPI(){
   else if(unit==='cm') ppi=pores*(inch/10);
   else ppi=pores;
   ppiValue.textContent=new Intl.NumberFormat(currentLang==="de"?"de-DE":"en-US",{maximumFractionDigits:1}).format(ppi);
+  
+
+  
 }
 pInput.addEventListener('input',updatePPI);
 units.forEach(u => u.addEventListener('change', () => {
-  // Immer den aktuellen Input-Wert neu berechnen
+
   if (pInput.value !== '') updatePPI();
 }));
-// === Tabs ===
+
 const tabFoam=document.getElementById('tabFoam');
 const tabFreq=document.getElementById('tabFreq');
 const foamTable=document.getElementById('foamTableContainer');
@@ -216,7 +221,6 @@ function switchTab(tab){
 tabFoam.addEventListener('click',()=>switchTab('foam'));
 tabFreq.addEventListener('click',()=>switchTab('freq'));
 
-// === Sprache ===
 document.getElementById('langSwitch').addEventListener('change',e=>{
   currentLang=e.target.value; applyLanguage();
 });
@@ -227,6 +231,9 @@ function applyLanguage(){
   document.getElementById('labelDiameter').textContent=t.labelDiameter;
   document.getElementById('labelThickness').textContent=t.labelThickness;
   document.getElementById('labelMass').textContent=t.labelMass;
+  document.getElementById('labelLength').textContent=t.labelLength;
+  document.getElementById('labelWidth').textContent=t.labelWidth;
+  document.getElementById('labelHeight').textContent=t.labelHeight;
   document.getElementById('calcTitle').textContent=t.calcTitle;
   document.getElementById('vol1Label').textContent=t.vol1Label;
   document.getElementById('vol2Label').textContent=t.vol2Label;
@@ -245,7 +252,6 @@ function applyLanguage(){
     label.innerHTML=`<input type="radio" name="unit" value="${input.value}" ${input.checked?'checked':''}> ${t.unitLabels[i]}`;
   });
 
-// === Foam & Frequency CSVs ===
 const foamCSV = {
   de: `Schaumstofftyp,Typische Dichte (kg/m³),Akustische Eigenschaften / Empfohlene Anwendung,Typischer NRC (α),Hinweise
 Leichter Verpackungsschaum (sehr niedrigdichtes PU),15–25,"Sehr leicht und offenporig → schwache Tieftonabsorption; leicht absorbierend bei Mittel-/Hochton. Hauptsächlich Verpackung, nicht Akustik.",0.20–0.35,"Kaum Akustikdämpfung; reflektiert unter 1 kHz."
@@ -280,7 +286,6 @@ Low Frequencies (<500 Hz),50–150,"Heavier open-cell or multilayer foams","Bass
 Soundproofing / Isolation,100–250,"High-mass technical foams, laminated","Machines, walls, automotive barriers",0.70–0.90`
 };
 
-// === Funktion zum Umwandeln von CSV in HTML-Table ===
 function csvToTable(csv, containerId) {
   const lines = csv.trim().split('\n');
   const headers = lines[0].split(',');
@@ -299,11 +304,9 @@ function csvToTable(csv, containerId) {
   container.innerHTML = html;
 }
 
-// === Tabellen initial laden ===
 csvToTable(foamCSV[currentLang], "foamTableContainer");
 csvToTable(freqCSV[currentLang], "freqTableContainer");
 
-// === Tabs aktivieren ===
 const tabFoam = document.getElementById('tabFoam');
 const tabFreq = document.getElementById('tabFreq');
 const foamTable = document.getElementById('foamTableContainer');
@@ -325,9 +328,6 @@ function switchTab(tab) {
 
 tabFoam.addEventListener('click', () => switchTab('foam'));
 tabFreq.addEventListener('click', () => switchTab('freq'));
-
-
-
 
   update(); updatePPI();
 }
