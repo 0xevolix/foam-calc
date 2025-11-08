@@ -182,10 +182,10 @@ function update(){
   dKg.textContent = formatter.format(density);
   dG.textContent = formatter.format(densityG);
 
-  const t = translations[currentLang].comparisonTexts;
-  if(density<15) comparison.textContent = t[0];
-  else if(density<30) comparison.textContent = t[1];
-  else comparison.textContent = t[2];
+//  const t = translations[currentLang].comparisonTexts;
+//  if(density<15) comparison.textContent = t[0];
+//  else if(density<30) comparison.textContent = t[1];
+//  else comparison.textContent = t[2];
 }
 
 [dInput,tInput,lInput,wInput,hInput,mInput].forEach(el=>el.addEventListener('input',update));
